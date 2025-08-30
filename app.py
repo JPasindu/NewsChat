@@ -1,4 +1,4 @@
-
+from flask import Flask, render_template, request
 
 import main_functions
 
@@ -21,4 +21,4 @@ def index():
     return render_template("index.html", preprocessed=preprocessed_data, output=output)
 
 if __name__ == "__main__":
-    app.run(debug=True, use_reloader=False)
+    app.run()

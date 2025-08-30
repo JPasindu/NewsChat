@@ -2,9 +2,9 @@ import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 import nltk
-#nltk.download('punkt')
-#nltk.download('stopwords')
-#nltk.download('wordnet')
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
 
 from groq import Groq
 import requests
@@ -12,7 +12,6 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import time
 import re
-import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.stem import WordNetLemmatizer
@@ -20,7 +19,6 @@ import string
 from sentence_transformers import SentenceTransformer
 from langchain_community.docstore.document import Document
 from langchain_community.vectorstores import FAISS
-from flask import Flask, render_template, request
 
 client = Groq(api_key="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")
 
