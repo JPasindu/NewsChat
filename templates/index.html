@@ -1,95 +1,531 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Flask Integration Example</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily News Chat - Sri Lanka</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background-color: #f8f9fa;
+        :root {
+            --primary-color: #d32f2f;
+            --secondary-color: #1976d2;
+            --dark-color: #2c3e50;
+            --light-color: #f5f5f5;
+            --gray-color: #eceff1;
+            --text-color: #333;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
             margin: 0;
             padding: 0;
-            color: #333;
+            box-sizing: border-box;
         }
-
-        h1 {
-            background: #0066cc;
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--gray-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        /* Header Styles */
+        .top-bar {
+            background-color: var(--dark-color);
             color: white;
-            text-align: center;
-            padding: 20px;
-            margin: 0;
-            border-bottom: 4px solid #004c99;
+            padding: 8px 0;
+            font-size: 14px;
         }
-
-        h2 {
-            color: #0066cc;
-            margin-top: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 40px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        form {
+        
+        .top-bar-container {
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .date-display {
+            font-weight: 500;
+        }
+        
+        .breaking-news {
+            display: flex;
+            align-items: center;
+        }
+        
+        .breaking-label {
+            background-color: var(--primary-color);
+            padding: 2px 8px;
+            margin-right: 10px;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+        
+        .header-main {
+            background-color: white;
+            box-shadow: var(--shadow);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            color: var(--primary-color);
+            font-size: 28px;
+            margin-left: 10px;
+        }
+        
+        .logo i {
+            color: var(--primary-color);
+            font-size: 32px;
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-menu li {
+            margin-left: 25px;
+        }
+        
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 600;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+        
+        .nav-menu a:hover {
+            color: var(--primary-color);
+        }
+        
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .chat-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+        }
+        
+        .chat-header h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .chat-header p {
+            opacity: 0.9;
+        }
+        
+        .chat-body {
+            padding: 25px;
+        }
+        
+        .chat-form {
+            display: flex;
             margin-top: 20px;
         }
-
-        input[type="text"] {
+        
+        .chat-input {
             flex: 1;
-            padding: 10px;
+            padding: 15px;
             border: 2px solid #ddd;
-            border-radius: 8px;
+            border-radius: 8px 0 0 8px;
             font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
         }
-
-        button {
-            background: #0066cc;
+        
+        .chat-input:focus {
+            border-color: var(--secondary-color);
+        }
+        
+        .chat-submit {
+            background: var(--secondary-color);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 0 25px;
             font-size: 16px;
-            border-radius: 8px;
+            font-weight: 600;
+            border-radius: 0 8px 8px 0;
             cursor: pointer;
             transition: background 0.3s;
         }
-
-        button:hover {
-            background: #004c99;
+        
+        .chat-submit:hover {
+            background: #1565c0;
         }
-
-        .response {
+        
+        .response-container {
             margin-top: 30px;
             padding: 20px;
-            border-left: 4px solid #0066cc;
-            background: #f1f8ff;
             border-radius: 8px;
+            background: var(--light-color);
+            border-left: 4px solid var(--secondary-color);
         }
-
+        
+        .response-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+        
+        .response-title i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        
+        .response-content {
+            line-height: 1.8;
+        }
+        
+        /* News Sidebar */
+        .news-sidebar {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        .sidebar-header {
+            background: var(--dark-color);
+            color: white;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .news-list {
+            list-style: none;
+            padding: 20px;
+        }
+        
+        .news-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .news-item:last-child {
+            border-bottom: none;
+        }
+        
+        .news-item h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .news-item p {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .news-item a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        
+        .news-item a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 50px;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+        
+        .footer-section h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary-color);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        
+        .social-links a:hover {
+            background: var(--primary-color);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            color: #ccc;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .nav-menu {
+                margin-top: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-menu li {
+                margin: 0 10px 10px;
+            }
+            
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .top-bar-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>
-
-    <h1>Sri Lanka's daily news chat</h1>
-
-    <div class="container">
-        <h2>Ask something about today's breaking news</h2>
-        <form method="POST">
-            <input type="text" name="user_text" placeholder="Type here..." required>
-            <button type="submit">Submit</button>
-        </form>
-
-        {% if output %}
-            <div class="response">
-                {{ output|safe }}
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-container">
+            <div class="date-display">
+                <i class="fas fa-calendar-alt"></i> 
+                <span id="current-date"></span>
             </div>
-        {% endif %}
+            <div class="breaking-news">
+                <span class="breaking-label">BREAKING</span>
+                <span class="breaking-text">Sri Lanka economic reforms show positive signs, says Central Bank Governor</span>
+            </div>
+        </div>
     </div>
+    
+    <!-- Header -->
+    <header class="header-main">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-newspaper"></i>
+                <h1>Daily News Chat</h1>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Politics</a></li>
+                <li><a href="#">Business</a></li>
+                <li><a href="#">Sports</a></li>
+                <li><a href="#">Entertainment</a></li>
+            </ul>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>Ask about today's breaking news</h2>
+                <p>Get instant information about current events in Sri Lanka</p>
+            </div>
+            <div class="chat-body">
+                <p>Our AI assistant is ready to answer your questions about today's news in Sri Lanka. Type your question below and get accurate, up-to-date information.</p>
+                
+                <form method="POST" class="chat-form">
+                    <input type="text" name="user_text" class="chat-input" placeholder="e.g., What's the latest on the economic situation?" required>
+                    <button type="submit" class="chat-submit">Ask <i class="fas fa-paper-plane"></i></button>
+                </form>
 
+                {% if output %}
+                <div class="response-container">
+                    <div class="response-title">
+                        <i class="fas fa-robot"></i>
+                        <h3>News Assistant Response</h3>
+                    </div>
+                    <div class="response-content">
+                        {{ output|safe }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!--following are Only for apperance for now-->
+        <div class="news-sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-bolt"></i> Trending News
+            </div>
+            <ul class="news-list">
+                <li class="news-item">
+                    <h3>Central Bank announces new monetary policy measures</h3>
+                    <p>The Central Bank of Sri Lanka has introduced several measures to stabilize the economy and control inflation.</p>
+                    <a href="#">Read more →</a>
+                </li>
+                <li class="news-item">
+                    <h3>Tourism arrivals show significant increase</h3>
+                    <p>Sri Lanka tourism records a 45% increase in visitor arrivals compared to last year.</p>
+                    <a href="#">Read more →</a>
+                </li>
+                <li class="news-item">
+                    <h3>National cricket team prepares for World Cup</h3>
+                    <p>The Sri Lankan cricket team begins intensive training ahead of the upcoming ICC tournament.</p>
+                    <a href="#">Read more →</a>
+                </li>
+                <li class="news-item">
+                    <h3>Government launches new agricultural initiative</h3>
+                    <p>A new program aims to support local farmers and increase food security across the island.</p>
+                    <a href="#">Read more →</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>About Us</h3>
+                <p>Daily News Chat provides the latest news and AI-powered insights about current events in Sri Lanka.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">News Categories</a></li>
+                    <li><a href="#">Archives</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>News Categories</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Politics</a></li>
+                    <li><a href="#">Business</a></li>
+                    <li><a href="#">Sports</a></li>
+                    <li><a href="#">Entertainment</a></li>
+                    <li><a href="#">Technology</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-map-marker-alt"></i> 123 News Street, Colombo</li>
+                    <li><i class="fas fa-phone"></i> +94 11 123 4567</li>
+                    <li><i class="fas fa-envelope"></i> info@dailynewschat.lk</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 Daily News Chat. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Set current date
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', options);
+    </script>
 </body>
 </html>

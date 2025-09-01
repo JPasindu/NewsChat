@@ -134,7 +134,7 @@ def scrap():
                 all_articles_data.append(article)
                 
                 time.sleep(1)  
-                if len(all_articles_data)>=3:
+                if len(all_articles_data)>=10:
                     break
             
             print("\n" + "="*80)
