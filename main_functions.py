@@ -15,24 +15,24 @@ from sentence_transformers import SentenceTransformer
 from langchain_community.vectorstores import FAISS
 import threading
 
-# Download NLTK data once
 try:
     nltk.download('punkt', quiet=True)
     nltk.download('stopwords', quiet=True)
     nltk.download('wordnet', quiet=True)
     nltk.download('punkt_tab', quiet=True)
 except:
-    pass  # Already downloaded
+    pass 
 
 
-# Global variables with lazy loading
 groq_client = None
 emb_model = None
 preprocessed_data = None
 vector_db = None
 data_lock = threading.Lock()
 base_url = 'http://www.adaderana.lk'
-    
+api_key = os.getenv("GROQ_API_KEY")
+
+
 headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 }
@@ -42,7 +42,7 @@ def initialize_components():
     global groq_client, emb_model
     
     if groq_client is None:
-        groq_client = Groq(api_key="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")
+        groq_client = Groq(api_key=api_key)
     
     if emb_model is None:
         emb_model = SentenceTransformer("all-MiniLM-L6-v2")
