@@ -12,9 +12,8 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-COPY python-packages/ python-packages/
 COPY requirements.txt .
-RUN pip install --no-index --find-links=python-packages 
+RUN pip install --timeout=100 --retries=5 --no-cache-dir -r requirements.txt
 
 COPY . .
 
