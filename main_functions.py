@@ -2,10 +2,6 @@ import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 import nltk
-nltk.download('punkt')
-nltk.download('stopwords')
-nltk.download('wordnet')
-
 from groq import Groq
 import requests
 from bs4 import BeautifulSoup
@@ -13,25 +9,49 @@ from urllib.parse import urljoin
 import time
 import re
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize, sent_tokenize
+from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
-import string
 from sentence_transformers import SentenceTransformer
-from langchain_community.docstore.document import Document
 from langchain_community.vectorstores import FAISS
+import threading
 
-client = Groq(api_key="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")
+# Download NLTK data once
+try:
+    nltk.download('punkt', quiet=True)
+    nltk.download('stopwords', quiet=True)
+    nltk.download('wordnet', quiet=True)
+    nltk.download('punkt_tab', quiet=True)
+except:
+    pass  # Already downloaded
 
+
+# Global variables with lazy loading
+groq_client = None
+emb_model = None
+preprocessed_data = None
+vector_db = None
+data_lock = threading.Lock()
 base_url = 'http://www.adaderana.lk'
     
 headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 }
 
+def initialize_components():
+    """Initialize heavy components once"""
+    global groq_client, emb_model
+    
+    if groq_client is None:
+        groq_client = Groq(api_key="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")
+    
+    if emb_model is None:
+        emb_model = SentenceTransformer("all-MiniLM-L6-v2")
+    
+    return groq_client, emb_model
+
 def get_article_content(article_url):
-        """
-        This function visits a single article page and extracts its main content.
-        """
+        """Fetch article content from URL"""
+
         print(f"Fetching article: {article_url}")
         try:
             response = requests.get(article_url, headers=headers, timeout=10)
@@ -75,9 +95,9 @@ def get_article_content(article_url):
         except Exception as e:
             print(f"  An error occurred while parsing the article: {e}")
             return "Error parsing article content."
-    
+
 def scrap():
-        """Main function to scrape headlines and their content."""
+        """Scrape news articles"""
         try:
             print("Scraping homepage for headlines and links...")
             response = requests.get(base_url, headers=headers, timeout=10)
@@ -146,27 +166,14 @@ def scrap():
             for article in all_articles_data:
                 news += f"HEADLINE: {article['title']} CONTENT: {article['content']}"
                     
-            print(f"\nFull results saved to 'daily_mirror_news.txt'")
             return news
     
         except Exception as e:
             print(f"A critical error occurred: {e}")
-
-
+        pass
 
 def preprocess_news_text(text, remove_stopwords=True, lemmatize=True, min_word_length=2):
-    """
-    Comprehensive preprocessing function for news articles.
-    
-    Parameters:
-    text (str): Raw input text
-    remove_stopwords (bool): Whether to remove stop words
-    lemmatize (bool): Whether to lemmatize words
-    min_word_length (int): Minimum word length to keep
-    
-    Returns:
-    str: Preprocessed text
-    """
+    """Preprocess text for analysis"""
     if not text or text.strip() == "":
         return ""
     
@@ -197,41 +204,60 @@ def preprocess_news_text(text, remove_stopwords=True, lemmatize=True, min_word_l
     processed_text = ' '.join(words)
     
     return processed_text[1:5000]
-
-def response(query, text1):
-    docs = [text1]
-    emb_model = SentenceTransformer("all-MiniLM-L6-v2")
-    vectors = emb_model.encode(docs)
     
-    doc_embeddings = [(docs[i], vectors[i]) for i in range(len(docs))]
-    db = FAISS.from_embeddings(doc_embeddings, emb_model)
 
-    query_vec = emb_model.encode([query])[0]
-    retrieved = db.similarity_search_by_vector(query_vec, k=2)
+def get_news_data():
+    """Get news data with caching"""
+    global preprocessed_data, vector_db
     
-    context = "\n".join([d.page_content for d in retrieved])
-    prompt = f"""
-            You are given the following context:
-
-            {context}
-
-            Question: {query}
-
-            Instructions:
-            - Write the answer in clean HTML.
-            - Use only <h3>, <h4>, and <p> tags for structuring the response.
-            - <h3> should be used for the main title.
-            - <h4> should be used for subheadings.
-            - <p> should be used for paragraphs of text.
-            - Do not use any other HTML tags.
-            """
-    chat_completion = client.chat.completions.create(
-        model="llama3-8b-8192",
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=300,
-    )
+    with data_lock:
+        if preprocessed_data is None:
+            print("Scraping fresh news data...")
+            raw_data = scrap()
+            preprocessed_data = preprocess_news_text(raw_data)
+            
+            # Initialize vector database
+            _, emb_model = initialize_components()
+            vectors = emb_model.encode([preprocessed_data])
+            doc_embeddings = [(preprocessed_data, vectors[0])]
+            vector_db = FAISS.from_embeddings(doc_embeddings, emb_model)
     
-    return chat_completion.choices[0].message.content
+    return preprocessed_data, vector_db
 
+def response(query):
+    """Generate response to query"""
+    preprocessed_data, vector_db = get_news_data()
+    _, emb_model = initialize_components()
+    
+    try:
+        query_vec = emb_model.encode([query])[0]
+        retrieved = vector_db.similarity_search_by_vector(query_vec, k=2)
+        context = "\n".join([d.page_content for d in retrieved])
+        
+        prompt = f"""
+        You are given the following context:
 
+        {context}
+
+        Question: {query}
+
+        Instructions:
+        - Write the answer in clean HTML.
+        - Use only <h3>, <h4>, and <p> tags for structuring the response.
+        - <h3> should be used for the main title.
+        - <h4> should be used for subheadings.
+        - <p> should be used for paragraphs of text.
+        - Do not use any other HTML tags.
+        """
+        
+        chat_completion = groq_client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=1000,
+        )
+        
+        return chat_completion.choices[0].message.content
+        
+    except Exception as e:
+        return f"<p>Error generating response: {str(e)}</p>"
 

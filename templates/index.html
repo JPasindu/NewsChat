@@ -114,6 +114,7 @@
         }
         
         /* Main Content */
+        /* Main Content */
         .main-container {
             max-width: 1200px;
             margin: 30px auto;
@@ -121,6 +122,7 @@
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 30px;
+            flex: 1; /* This makes the main content grow to fill space */
         }
         
         .chat-container {
@@ -147,6 +149,7 @@
         
         .chat-body {
             padding: 25px;
+            min-height: 450px; 
         }
         
         .chat-form {
@@ -208,59 +211,6 @@
             line-height: 1.8;
         }
         
-        /* News Sidebar */
-        .news-sidebar {
-            background: white;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-        
-        .sidebar-header {
-            background: var(--dark-color);
-            color: white;
-            padding: 15px 20px;
-            font-size: 18px;
-            font-weight: 600;
-        }
-        
-        .news-list {
-            list-style: none;
-            padding: 20px;
-        }
-        
-        .news-item {
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .news-item:last-child {
-            border-bottom: none;
-        }
-        
-        .news-item h3 {
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-        
-        .news-item p {
-            font-size: 14px;
-            color: #666;
-        }
-        
-        .news-item a {
-            color: var(--secondary-color);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            display: inline-block;
-            margin-top: 5px;
-        }
-        
-        .news-item a:hover {
-            text-decoration: underline;
-        }
-        
         /* Footer */
         .footer {
             background: var(--dark-color);
@@ -270,7 +220,7 @@
         }
         
         .footer-container {
-            max-width: 1200px;
+            max-width: 2000px;
             margin: 0 auto;
             padding: 0 20px;
             display: grid;
@@ -345,17 +295,18 @@
         }
         
         /* Responsive Design */
-        @media (max-width: 992px) {
+        @media (max-width: 2000px) {
             .main-container {
                 grid-template-columns: 1fr;
             }
             
+        }
+        
+        @media (max-width: 1000px) {
             .footer-container {
                 grid-template-columns: repeat(2, 1fr);
             }
-        }
-        
-        @media (max-width: 768px) {
+
             .header-container {
                 flex-direction: column;
                 text-align: center;
@@ -381,6 +332,7 @@
                 gap: 10px;
             }
         }
+        
     </style>
 </head>
 <body>
@@ -444,36 +396,7 @@
                 {% endif %}
             </div>
         </div>
-        
-        <!--following are Only for apperance for now-->
-        <div class="news-sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-bolt"></i> Trending News
-            </div>
-            <ul class="news-list">
-                <li class="news-item">
-                    <h3>Central Bank announces new monetary policy measures</h3>
-                    <p>The Central Bank of Sri Lanka has introduced several measures to stabilize the economy and control inflation.</p>
-                    <a href="#">Read more →</a>
-                </li>
-                <li class="news-item">
-                    <h3>Tourism arrivals show significant increase</h3>
-                    <p>Sri Lanka tourism records a 45% increase in visitor arrivals compared to last year.</p>
-                    <a href="#">Read more →</a>
-                </li>
-                <li class="news-item">
-                    <h3>National cricket team prepares for World Cup</h3>
-                    <p>The Sri Lankan cricket team begins intensive training ahead of the upcoming ICC tournament.</p>
-                    <a href="#">Read more →</a>
-                </li>
-                <li class="news-item">
-                    <h3>Government launches new agricultural initiative</h3>
-                    <p>A new program aims to support local farmers and increase food security across the island.</p>
-                    <a href="#">Read more →</a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    </div>  
     
     <footer class="footer">
         <div class="footer-container">

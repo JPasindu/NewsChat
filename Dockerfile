@@ -1,12 +1,20 @@
-FROM python:3.10-slim
+FROM python:3.10.13-slim-bullseye
 
-ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV HF_HOME=/tmp
+ENV NLTK_DATA=/tmp/nltk_data
+
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
+COPY python-packages/ python-packages/
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-index --find-links=python-packages 
 
 COPY . .
 
