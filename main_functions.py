@@ -31,6 +31,8 @@ vector_db = None
 data_lock = threading.Lock()
 base_url = 'http://www.adaderana.lk'
 api_key = os.getenv("GROQ_API_KEY")
+if not api_key:
+    raise ValueError("No API key found. Please set GROQ_API_KEY.")
 
 
 headers = {
